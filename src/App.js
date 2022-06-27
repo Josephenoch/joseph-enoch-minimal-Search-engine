@@ -5,6 +5,8 @@ import { useState } from 'react';
 
 function App() {
   const [found, setFound] = useState(null)
+  const [location, setLocation] = useState([])
+
   const hi = ["1","2"]
   const a = {
        user: {
@@ -22,7 +24,7 @@ function App() {
       }
   return (
     <div className="App bg-gray-400 pt-10 flex-col flex items-center h-screen">
-      <SearchBar items={a} setFound={setFound}/>
+      <SearchBar items={a} setFound={setFound} location={location} setLocation={setLocation} parentLocation="a"/>
       {found?"found":"Not Found"}
     </div>
   );

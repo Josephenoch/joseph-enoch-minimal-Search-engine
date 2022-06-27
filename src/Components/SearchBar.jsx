@@ -1,38 +1,53 @@
 import React from 'react'
+import { useEffect } from 'react'
 import { useRef } from 'react'
 
-const SearchBar = ({items, setFound}) => {
+const SearchBar = ({items, setFound,location, setLocation, parentLocation}) => {
   const inputRef = useRef()
   const formRef = useRef()
   const handleSubmit = (e) =>{
     e.preventDefault()
-    setFound(findItem(items))
+    const {found,location:newLocation} =findItem(items,location,"")
+    console.log(found,newLocation)   
+    setFound(found)
+    setLocation(newLocation)
   }
-  const findItem = (items) =>{
+  useEffect(()=>{
+    setLocation(prevState=>{
+        const newState = prevState
+        newState.push(parentLocation)
+        return newState
+    })
+  },[])
+  const findItem = (items,locationArray, oldLoaction) =>{
+    const locationArr = [...locationArray]
+    locationArr.push(oldLoaction)
     if(Array.isArray(items)){
         for(let i = 0; i<items.length;i++){
             if(typeof(items[i])==="string"||typeof(items[i])==="number"||typeof(items[i])==="boolean"){
+                console.log("hi")
                 if(items[i] == inputRef.current.value) {
-                    return true 
+                    return {found:true, location:locationArr}  
                 }
-                else if(i===items.length-1) return false
+                else if(i===items.length-1) return {found:false, location:[]} 
             }
             else if(Array.isArray(items[i])){ 
-                const bool = findItem(items[i])               
+                const {found:bool,location:newLocation} = findItem(items[i], locationArr,`[${i}]`)
                 if(bool){
-                    return true
+                    return {found:true,location:locationArr.push(newLocation)}
                 }
                 else if(bool===false && i===items.length-1 ){
-                    return false
+                
+                    return {found:false,location:[]}
                 }
             }
             else if(typeof(items[i])==="object"){
-                const bool = findItem(items[i])               
+                const {found:bool,location:newLocation} = findItem(items[i], locationArr,`${items[i]}`)               
                 if(bool){
-                    return true
+                    return {found:true,location:locationArr.push(newLocation)}
                 }
                 else if(bool===false && i===items.length-1 ){
-                    return false
+                    return {found:false,location:[]}
                 }
             }
         }
@@ -42,27 +57,27 @@ const SearchBar = ({items, setFound}) => {
         for(let i = 0; i<itemss.length;i++){
             if(typeof(itemss[i])==="string"||typeof(itemss[i])==="number"||typeof(itemss[i])==="boolean"){
                 if(itemss[i] == inputRef.current.value) {
-                    return true 
+                    return {found:true, location:locationArr} 
                 }
-                else if(i===itemss.length-1) return false
+                else if(i===itemss.length-1) return {found:false,location:""}
             }
-            else if(Array.isArray(itemss[i])){ 
-                const bool = findItem(itemss[i])               
+            else if(Array.isArray(items[i])){ 
+                const {found:bool,location:newLocation} = findItem(itemss[i], locationArr,`${items[i]}[${i}]`)             
                 if(bool){
-                    return true
+                    return {found:true,location:locationArr.push(newLocation)}
                 }
                 else if(bool===false && i===itemss.length-1 ){
-                    return false
+                
+                    return {found:false,location:""}
                 }
             }
             else if(typeof(itemss[i])==="object"){
-                const bool = findItem(itemss[i])               
+                const {found:bool,location:newLocation} = findItem(itemss[i], locationArr,`${items[i]}`)
                 if(bool){
-                    return true
+                    return {found:true,location:locationArr.push(newLocation)}
                 }
-                else if(bool===false && i===itemss.length-1 ){
-                    return false
-                }
+                else if(bool===false && i===itemss.length-1 )return {found:false,location:""}
+                
             }
         }
     }
